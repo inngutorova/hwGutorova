@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Topic {
     private String name;
-    private ArrayList<Comment> comments;
+    private ArrayList<Comment> comments = new ArrayList<>();
 
     public Topic(String name) {
         this.setName(name);
