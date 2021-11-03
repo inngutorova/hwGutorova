@@ -8,6 +8,7 @@ import java.util.List;
 public class ApiController {
 
     private List<Topic> topics = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     // curl -X GET http://localhost:8080/topics - Выдать список тем
     @GetMapping("topics")
@@ -25,7 +26,7 @@ public class ApiController {
     // curl -X POST http://localhost:8080/topics -H 'Content-Type: text/plain' -d 'Cherry orchard' - Создать тему
     @PostMapping("topics")
     public void addTopic(@RequestBody String t) {
-       topics.add(new Topic(t));
+        topics.add(new Topic(t));
     }
 
     // curl -X GET http://localhost:8080/opics/0 -  Выдать определенную тему
@@ -61,24 +62,70 @@ public class ApiController {
         return topics.get(i).getComments();
     }
 
-    // curl -X POST http://localhost:8080/topics/0/comments -H 'Content-Type: text/plain' -d 'Wow' - Создать комментарий в определенной теме
-    @PostMapping("topics/{index}/comments")
-    public void addComment(@PathVariable("index") Integer i, @RequestBody String t) {
-        topics.get(i).getComments().add(new Comment(t));
+    // curl -X POST http://localhost:8080/topics/0/0/comments -H 'Content-Type: text/plain' -d 'Wow' - Создать комментарий в определенной теме
+    @PostMapping("themes/{index}/{indUser}/comments")
+    public void addComment(@PathVariable("index") Integer i, @PathVariable("indUser") Integer ind, @RequestBody String text) {
+        users.get(ind).getComments().add(new Comment(text));
+        topics.get(i).getComments().add(new Comment(text));
     }
 
-    // curl -X DELETE http://localhost:8080/topics/0/comments/0 - Удалить комментарий из определенной темы
-    @DeleteMapping("topics/{index}/comments/{index2}")
-    public void deleteComment(@PathVariable("index") Integer i, @PathVariable("index2") Integer c) {
-        topics.get(i).getComments().remove(c);
+    // curl -X DELETE http://localhost:8080/topics/0/0/comments/0 - Удалить комментарий из определенной темы
+    @DeleteMapping("themes/{index}/{indUser}/comments/{indexCom}")
+    public void deleteComment(@PathVariable("index") Integer index, @PathVariable("indUser") Integer ind, @PathVariable("indexCom") Integer indexCom) {
+        users.get(ind).getComments().remove(indexCom);
+        topics.get(index).getComments().remove(indexCom);
     }
 
-    // curl -X PUT http://localhost:8080/topics/0/comments/0-H 'Content-Type: text/plain' -d 'Cool' - Обновить комментарий в определенной теме
-    @PutMapping("topics/{index}/comments/{index2}")
-    public void updateTopic(@PathVariable("index") Integer i,@PathVariable("index2") Integer c, @RequestBody String t) {
-        topics.get(i).getComments().get(c).setText(t);
+    // curl -X PUT http://localhost:8080/topics/0/0/comments/0-H 'Content-Type: text/plain' -d 'Cool' - Обновить комментарий в определенной теме
+    @PutMapping("themes/{index}/{indUser}/comments/{indexCom}")
+    public void updateComment(@PathVariable("index") Integer i, @PathVariable("indUser") Integer ind,@PathVariable("indexCom") Integer indexCom, @RequestBody String text) {
+        users.get(ind).getComments().get(indexCom).setText(text);
+        topics.get(i).getComments().get(indexCom).setText(text);
     }
 
 
+
+    // curl -X POST http://localhost:8080/users -H 'Content-Type:application/json' -d '{"name" : "Inna Gutorova", "age" : "17"}'
+    @PostMapping("users")
+    public void addUser(@RequestBody User user) {
+        users.add(new User(user.name, user.age));
+    }
+
+    // curl -X DELETE http://localhost:8080/users/0
+    @DeleteMapping("users/{index}")
+    public void deleteUser(@PathVariable("index") Integer index) {
+        users.remove((int) index);
+    }
+
+    // curl -X GET http://localhost:8080/users/0
+    @GetMapping("users/{index}")
+    public User getUser(@PathVariable("index") Integer index) {
+        return users.get(index);
+    }
+
+    // curl -X GET http://localhost:8080/users
+    @GetMapping("users")
+    public List<User> getUsers() {
+        return users;
+    }
+
+    // curl -X PUT http://localhost:8080/users/0 -H 'Content-Type: application/json' -d '13' - Обновить комментарий определенного пользователя в определенной теме
+    @PutMapping("users/{index}")
+    public void updateUserAge(@PathVariable("index") Integer i, @RequestBody int age) {
+        users.get(i).setAge(age);
+    }
+
+    // curl -X GET http://localhost:8080/users/0/comments
+    @GetMapping("users/{index}/comments")
+    public List<Comment> getUserComments(@PathVariable("index") Integer i) {
+        return users.get(i).getComments();
+    }
+
+    // curl -X PUT http://localhost:8080/themes/0/0/comments/0 -H 'Content-Type: text/plain' -d 'Wow'
+    @PutMapping("users/{index}/{ind}/comments/{indexCom}")
+    public void updateUserComment(@PathVariable("index") Integer i, @PathVariable("ind") Integer ind, @PathVariable("indexCom") Integer indexCom, @RequestBody String text) {
+        users.get(i).getComments().get(indexCom).setText(text);
+        topics.get(ind).getComments().get(indexCom).setText(text);
+    }
 }
 
